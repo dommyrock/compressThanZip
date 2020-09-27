@@ -3,8 +3,18 @@ import styles from "../styles/Home.module.css";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Container } from "../src/components/droppable/DroppableContainer";
+import { useReducer } from "react";
+import { dragEventsReducer } from "../src/reducers/dragEventsReducer";
+import DragAndDrop from "../src/components/customDnd/DragAndDrop";
 
 export default function Home() {
+  //v2
+  const [data, dispatch] = useReducer(dragEventsReducer, {
+    dropDepth: 0,
+    inDropZone: false,
+    fileList: [],
+  });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,7 +23,16 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        {/* TODO ..FIND OUT HOW TO CUSTOMIZE REACT DND OR MAKE IT ALL CUSTOM FOR EASYER STYLNG (WEB DEV EXAMPLE) */}
+        {/* Custom dnd TODO: refactor this with memo and useCallback liek premade dnd and add custom css from "vanila with gallery*/}
+        <div>
+          <DragAndDrop data={data} dispatch={dispatch} />
+          <ol className="dropped-files">
+            {data.fileList.map((f) => {
+              return <li key={f.name}>{f.name}</li>;
+            })}
+          </ol>
+        </div>
+        {/* react-dnd Premade compoenent for handling file dnd , wash hard to style so i made custom one */}
         <DndProvider backend={HTML5Backend}>
           <Container />
         </DndProvider>
@@ -24,6 +43,11 @@ export default function Home() {
             <ul>
               <li>
                 <a href="https://web.dev/drag-and-drop/">web dev</a>
+              </li>
+              <li>
+                <a href="https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/">
+                  Vanila with gallery
+                </a>
               </li>
               <li>
                 <a href="https://www.digitalocean.com/community/tutorials/js-drag-and-drop-vanilla-js">
