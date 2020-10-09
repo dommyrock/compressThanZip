@@ -1,11 +1,9 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { Container } from "../src/components/droppable/DroppableContainer";
 import { useReducer } from "react";
 import { dragEventsReducer } from "../src/reducers/dragEventsReducer";
 import DragAndDrop from "../src/components/customDnd/DragAndDrop";
+// import { Container } from "../src/components/droppable/DroppableContainer";
 
 export default function Home() {
   //v2
@@ -32,10 +30,10 @@ export default function Home() {
             })}
           </ol>
         </div>
-        {/* react-dnd Premade compoenent for handling file dnd , wash hard to style so i made custom one */}
-        <DndProvider backend={HTML5Backend}>
+        {/* react-dnd Premade compoenent -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
+        {/* <DndProvider backend={HTML5Backend}>
           <Container />
-        </DndProvider>
+        </DndProvider> */}
 
         <div style={{ border: "solid" }}>
           <div style={{ margin: "4px", border: "solid" }}>
