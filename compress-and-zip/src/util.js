@@ -9,20 +9,26 @@ export default {
       mime_type = "image/jpeg";
     }
     //#region Downscale
-    let downscale = { maxW: 0, maxH: 0 };
-    if (source_img_obj.naturalWidth > source_img_obj.naturalHeight) {
-      downscale.maxW = 1600;
-      downscale.maxH = 1200;
+    let downscale = { maxW: 1600, maxH: 1200 }; //WhatsApp downscale sizes
+    if (
+      source_img_obj.naturalWidth < downscale.maxW ||
+      source_img_obj.naturalHeight < downscale.maxH
+    ) {
+      //keep original dimensions for smaller pictures
+      downscale.maxW = source_img_obj.naturalWidth;
+      downscale.maxH = source_img_obj.naturalHeight;
     } else {
-      downscale.maxW = 1200;
-      downscale.maxH = 1600;
+      if (source_img_obj.naturalWidth < source_img_obj.naturalHeight) {
+        downscale.maxW = 1200;
+        downscale.maxH = 1600;
+      }
     }
     const aspectRatio = this.calculateAspectRatioFit(
       source_img_obj.naturalWidth,
       source_img_obj.naturalHeight,
       downscale.maxW,
       downscale.maxH
-    ); //WhatsApp downscale sizes
+    );
     //#endregion Downscale
 
     let cvs = document.createElement("canvas");
@@ -39,7 +45,7 @@ export default {
   async returnNewImageAsync(src, width, height) {
     return new Promise((resolve, reject) => {
       let result_image_obj = new Image();
-
+      //alter image if needed
       result_image_obj.onload = () => {
         result_image_obj.width = width;
         result_image_obj.height = height;
