@@ -31,12 +31,12 @@ export default {
     );
     //#endregion Downscale
 
-    let cvs = document.createElement("canvas");
-    [cvs.width, cvs.height] = [aspectRatio.width, aspectRatio.height];
-    let ctx = cvs.getContext("2d");
+    let canvas = document.createElement("canvas");
+    [canvas.width, canvas.height] = [aspectRatio.width, aspectRatio.height];
+    let ctx = canvas.getContext("2d");
     //drawimage:https://devdocs.io/dom/canvasrenderingcontext2d/drawimage
     ctx.drawImage(source_img_obj, 0, 0, aspectRatio.width, aspectRatio.height);
-    let newImageData = cvs.toDataURL(mime_type, quality / 100);
+    let newImageData = canvas.toDataURL(mime_type, quality / 100);
     let result_image_obj = new Image();
     result_image_obj.src = newImageData;
     return result_image_obj;
@@ -74,4 +74,9 @@ export default {
   },
   //other options (smooothing ,alpha....)
   //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+
+  roundUp(num, precision) {
+    precision = Math.pow(10, precision);
+    return Math.ceil(num * precision) / precision;
+  },
 };
