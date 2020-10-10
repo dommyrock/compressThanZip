@@ -21,15 +21,19 @@ a:hover {
 .drag-drop-zone {
   padding: 2rem;
   text-align: center;
-  background: #07f;
   border-radius: 0.5rem;
   box-shadow: 5px 5px 10px #c0c0c0;
+  border: dashed;
 }
 .drag-drop-zone p {
-  color: #fff;
+  color: #000;
+  font-weight: 700;
+  z-index: 10;
 }
 .drag-drop-zone.inside-drag-area {
   opacity: 0.7;
+  background-color: rgba(13, 243, 224, 0.637);
+  border-color: rgb(68, 68, 68);
 }
 .dropped-files li {
   color: #07f;
