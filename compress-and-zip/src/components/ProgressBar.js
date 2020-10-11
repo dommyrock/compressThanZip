@@ -1,44 +1,20 @@
 import { memo } from "react";
 
-const ProgressBar = memo((props) => {
+const ProgressBar = (props) => {
   const { completed } = props;
 
-  const containerStyles = {
-    height: 20,
-    width: "100%",
-    backgroundColor: "#e0e0de",
-    borderRadius: 50,
-    margin: 50,
-  };
-
-  const fillerStyles = {
-    height: "100%",
-    width: `${completed}%`,
-    backgroundImage: `linear-gradient(
-        to right,
-        rgb(41, 115, 226),
-        rgb(221, 180, 153),
-        rgb(34, 235, 174)
-      )`,
-    borderRadius: "5px",
-    // borderRadius: "inherit",
-    textAlign: "right",
-    transition: "width 1s ease-in-out",
-  };
-
-  const labelStyles = {
-    padding: 5,
-    color: "white",
-    fontWeight: "bold",
-  };
-
   return (
-    <div style={containerStyles}>
-      <div style={fillerStyles}>
-        <span style={labelStyles}>{`${completed}%`}</span>
+    <div className="progress-container">
+      <div className="progress-fill" style={{ width: `${completed}%` }}>
+        <span className=" progress-label">{`${completed}%`}</span>
       </div>
     </div>
   );
-});
+};
 
-export default ProgressBar;
+export default memo(ProgressBar);
+
+//For non primitive data structures like objects, array ,functions memo does shallow comparison (reference in memory )
+// If i had CB function passed as prop i would neeed >useCallbact to memoize it
+// (else it would cause rerendeing of this child even if i changed something non relted in parent)
+//For computed values that take long time --> useMemo

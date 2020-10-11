@@ -3,6 +3,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import util from "../../util";
 import ProgressBar from "../ProgressBar";
 import { saveAs } from "file-saver";
+import JSZip from "jszip";
+//Convert loaded imgs to blobs (so we can zip/save)
+//TODO: zip.js docs https://gildas-lormeau.github.io/zip.js/core-api.html
 
 const DragAndDrop = (props) => {
   const { data, dispatch } = props;
@@ -10,33 +13,32 @@ const DragAndDrop = (props) => {
   const [totalCompressed, setTotalCompressed] = useState({
     origionalSize: 0,
     compressedSize: 0,
-    percent: 0,
   });
-  // const [completed, setCompleted] = useState(0);
+  const [percent, setPercent] = useState(0);
 
-  const workerRef = useRef();
-  useEffect(() => {
-    workerRef.current = new Worker("../../../worker", { type: "module" });
+  // const workerRef = useRef(); Currently not used
+  // useEffect(() => {
+  //   workerRef.current = new Worker("../../../worker", { type: "module" });
 
-    //worker.js respose posted here
-    workerRef.current.onmessage = async (evt) => {
-      debugger;
-      console.log(`WebWorker Response =>`);
-      console.log(evt.data);
-    };
+  //   //worker.js respose posted here
+  //   workerRef.current.onmessage = async (evt) => {
+  //     debugger;
+  //     console.log(`WebWorker Response =>`);
+  //     console.log(evt.data);
+  //   };
 
-    return () => {
-      workerRef.current.terminate();
-    };
-  }, []);
+  //   return () => {
+  //     workerRef.current.terminate();
+  //   };
+  // }, []);
 
-  //Worker handler
-  const handleWork = useCallback(
-    async (data) => {
-      workerRef.current.postMessage(data);
-    },
-    [data]
-  );
+  // //Worker handler
+  // const handleWork = useCallback(
+  //   async (data) => {
+  //     workerRef.current.postMessage(data);
+  //   },
+  //   [data]
+  // );
 
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -64,13 +66,13 @@ const DragAndDrop = (props) => {
     e.dataTransfer.dropEffect = "copy";
     dispatch({ type: SET_IN_DROP_ZONE, inDropZone: true });
   };
-  //TODO: make ui and components so i can load thumbnails into some kind of carrosel
-  //and show compression progress if possible !
+  //TODO: make ui and components so i can load thumbnails into some kind of carrosel,
+  //TODO 2 use react-tree-fiber +/- spring for some cool animations as img's are being loaded to DOM
   /**
    * https://codepen.io/joezimjs/pen/yPWQbd
    * https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
    * and see premade dnd compoenets for react performance optimization and re-enter dragging event
-   *
+   *  + offload work with workers where posible ( zipping should be moved first )
    * + add react-tree fiber or spring for cool animations (for example as thumbs render drop down to carrosell animation )
    */
   const handleDrop = async (e) => {
@@ -79,14 +81,12 @@ const DragAndDrop = (props) => {
     let files = [...e.dataTransfer.files];
 
     //#region  Worker-code
-    //File blob to Uint8Array (used in fflate npm ---but couldnt make it work w images)
-    // const massiveFbuff = new Uint8Array(await files[0].arrayBuffer());
     // let buffers = [];
     // //Read files as array buffers (so i can send Transferrable objects-more effiecient and faster)
     // for (const file of files) {
     //   buffers.push(await file.arrayBuffer());
     // }
-    // //post ile buffers to Worker
+    // //post file buffers to Worker
     // handleWork({ fileBuffers: buffers }, buffers);
     //#endregion Worker-code
     const percentageIndex = 100 / files.length;
@@ -108,7 +108,7 @@ const DragAndDrop = (props) => {
           img.onload = () => {
             //1024 bytes =1k ,1024 Kb = 1Mb
             const orgSize = img.src.length / (1024 * 1024);
-            let compressedImg = util.toCompressedImg(img, 55, "jpeg");
+            let compressedImg = util.toCompressedImg(img, 65, "jpeg", file.name);
 
             document.getElementById("gallery").appendChild(compressedImg);
             //#region Calc toal compression
@@ -119,17 +119,17 @@ const DragAndDrop = (props) => {
             const roundedSumAfter = util.roundUp(sumAfterCompression, 2);
             //#endregion
 
-            //Update progress percentage ( NOTE: its updating to fast to rerender all stages :/)
+            //Update progress percentage ( NOTE: when debugging one by one it renders properly , IRL style width lags behind)
             percentSum += percentageIndex;
             let rounded = util.roundUp(percentSum, 2);
             if (percentSum > 100) {
               rounded = 100;
             }
+            setPercent(rounded);
             console.log(`Process currently @ ${rounded}%`);
             setTotalCompressed({
               origionalSize: roundedSumBefore,
               compressedSize: roundedSumAfter,
-              percent: rounded,
             });
             resolve(compressedImg);
           };
@@ -151,9 +151,26 @@ const DragAndDrop = (props) => {
       promises.push(filePromise);
     }
     const processedImages = await Promise.all(promises);
-    debugger;
 
-    // saveAs(content, "compressedImages.zip",);
+    let blobs = [];
+    for (const img of processedImages) {
+      const response = await fetch(img.src);
+      blobs.push({ blob: response.blob(), name: img.id });
+    }
+    const blobsToZip = await Promise.all(blobs);
+
+    //#region JSZip
+    let zip = new JSZip();
+    for (let index = 0; index < blobsToZip.length; index++) {
+      const fileName = blobsToZip[index].name;
+      debugger;
+      zip.file(fileName, blobsToZip[index].blob); //3rd param is options {}
+    }
+    zip.generateAsync({ type: "blob", compression: "STORE" }).then((content) => {
+      debugger;
+      saveAs(content, "compressedImages");
+    });
+    //#endregion
 
     if (files && files.length > 0) {
       const existingFiles = data.fileList.map((f) => f.name);
@@ -186,7 +203,7 @@ const DragAndDrop = (props) => {
       </div>
       {/* <progress id="progress-bar" max={100} value={0}></progress> html5 variant*/}
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <ProgressBar key="progress-bar" completed={totalCompressed.percent} />
+        <ProgressBar key="progress-bar" completed={percent} />
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div id="gallery"></div>

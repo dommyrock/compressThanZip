@@ -66,4 +66,31 @@ progress[value]::-webkit-progress-value {
   );
   border-radius: 6px;
 }
+/*  v2*/
+
+.progress-container {
+  height: 20px;
+  width: 100%;
+  background-color: #e0e0de;
+  border-radius: 5px;
+  margin: 30px;
+}
+.progress-fill {
+  height: 100%;
+  /* width: 100%; gets dynamicly populated*/
+  background-image: linear-gradient(
+    to right,
+    rgb(41, 115, 226),
+    rgb(221, 180, 153),
+    rgb(34, 235, 174)
+  );
+  border-radius: 5px;
+  text-align: right;
+  transition: width 1s ease-in-out;
+}
+.progress-label {
+  padding: 5px;
+  color: #fff;
+  font-weight: bold;
+}
 /*progress bar css ends */

@@ -1,8 +1,15 @@
 export default {
-  toCompressedImg(source_img_obj, quality, output_format) {
+  /**
+   *
+   * @param {Image} source_img_obj
+   * @param {Number} quality
+   * @param {String} output_format
+   * @param {String} image_Id
+   */
+  toCompressedImg(source_img_obj, quality, output_format, image_Id) {
     let mime_type;
     if (output_format === "png") {
-      mime_type = "image/png";
+      mime_type = "image/png"; //since quality arg only suporst jpg,and webp might need to convert this format to one of 2
     } else if (output_format === "webp") {
       mime_type = "image/webp";
     } else {
@@ -37,25 +44,27 @@ export default {
     //drawimage:https://devdocs.io/dom/canvasrenderingcontext2d/drawimage
     ctx.drawImage(source_img_obj, 0, 0, aspectRatio.width, aspectRatio.height);
     let newImageData = canvas.toDataURL(mime_type, quality / 100);
+
     let result_image_obj = new Image();
+    result_image_obj.id = image_Id;
     result_image_obj.src = newImageData;
     return result_image_obj;
   },
   //resize img if needed
-  async returnNewImageAsync(src, width, height) {
-    return new Promise((resolve, reject) => {
-      let result_image_obj = new Image();
-      //alter image if needed
-      result_image_obj.onload = () => {
-        result_image_obj.width = width;
-        result_image_obj.height = height;
-        resolve(result_image_obj);
-      };
-      result_image_obj.onerror = (ev) => reject(ev);
-      //trigger onload
-      result_image_obj.src = src;
-    });
-  },
+  // async returnNewImageAsync(src, width, height) {
+  //   return new Promise((resolve, reject) => {
+  //     let result_image_obj = new Image();
+  //     //alter image if needed
+  //     result_image_obj.onload = () => {
+  //       result_image_obj.width = width;
+  //       result_image_obj.height = height;
+  //       resolve(result_image_obj);
+  //     };
+  //     result_image_obj.onerror = (ev) => reject(ev);
+  //     //trigger onload
+  //     result_image_obj.src = src;
+  //   });
+  // },
 
   /**
    * Conserve aspect ratio of the original region. Useful when shrinking/enlarging
