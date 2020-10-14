@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useSpring, animated, interpolate } from "react-spring";
 import { useGesture } from "react-with-gesture";
+import { SET_OUTPUT_FORMAT } from "../actions";
 
-const FormatSlider = ({ children }) => {
+const FormatSlider = ({ children, dispatch }) => {
   const [bind, { delta, down }] = useGesture();
   const { x, bg, size } = useSpring({
     x: down ? delta[0] : 0,
@@ -21,6 +23,11 @@ const FormatSlider = ({ children }) => {
   let renderText = "";
   if (delta[0] > 180) renderText = "jpeg";
   else if (delta[0] < -90) renderText = "webp";
+  useEffect(() => {
+    //update state in home component
+    dispatch({ SET_OUTPUT_FORMAT, renderText });
+  }, [renderText]);
+
   return (
     <animated.div {...bind()} className="item" style={{ background: bg }}>
       <animated.div

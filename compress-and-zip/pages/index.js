@@ -12,6 +12,7 @@ export default function Home() {
     dropDepth: 0,
     inDropZone: false,
     fileList: [],
+    outputFormat: "",
   });
 
   return (
@@ -23,7 +24,7 @@ export default function Home() {
 
       <main className={styles.main}>
         {/* Custom dnd TODO: refactor this with memo and useCallback liek premade dnd and add custom css from "vanila with gallery*/}
-        <FormatSlider>Format</FormatSlider>
+        <FormatSlider dispatch={dispatch}>Format</FormatSlider>
         <div>
           <DragAndDrop data={data} dispatch={dispatch} />
           <ol className="dropped-files">
