@@ -7,6 +7,7 @@ import JSZip from "jszip";
 //Convert loaded imgs to blobs (so we can zip/save)
 //TODO: zip.js docs https://gildas-lormeau.github.io/zip.js/core-api.html
 
+//memo is not enough here since also pasing dispatch , i would also need to wrap dispatch in useCallback
 const DragAndDrop = (props) => {
   const { data, dispatch } = props;
 
@@ -15,6 +16,18 @@ const DragAndDrop = (props) => {
     compressedSize: 0,
   });
   const [percent, setPercent] = useState(0);
+  const [thumbs, setThumbs] = useState([]);
+
+  function handleFiles(files) {
+    debugger;
+    return files.map((file) => (
+      <div style={thumb} key={file.name}>
+        <div style={thumbInner}>
+          <img src={URL.createObjectURL(file)} style={img} />
+        </div>
+      </div>
+    ));
+  }
 
   // const workerRef = useRef(); Currently not used
   // useEffect(() => {
@@ -72,13 +85,18 @@ const DragAndDrop = (props) => {
    * https://codepen.io/joezimjs/pen/yPWQbd
    * https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
    * and see premade dnd compoenets for react performance optimization and re-enter dragging event
-   *  + offload work with workers where posible ( zipping should be moved first )
-   * + add react-tree fiber or spring for cool animations (for example as thumbs render drop down to carrosell animation )
+   * 1+ add react-tree fiber or spring for cool animations (for example as thumbs render drop down to carrosell animation )
+   * see https://www.youtube.com/watch?v=5QCYBiANRYs&ab_channel=ReactEurope
+   * 2+ offload work with workers where posible ( zipping should be moved first )
+   * 3+ add sharing to google drive,one drive,dropbox ... (use their api's,auth...)
+   * 4+ add ML (image tagging/classification w ML models...)
    */
   const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     let files = [...e.dataTransfer.files];
+
+    setThumbs(handleFiles(files));
 
     //#region  Worker-code
     // let buffers = [];
@@ -110,12 +128,12 @@ const DragAndDrop = (props) => {
             const orgSize = img.src.length / (1024 * 1024);
             let compressedImg = util.toCompressedImg(img, 65, "jpeg", file.name);
 
-            document.getElementById("gallery").appendChild(compressedImg);
+            // document.getElementById("gallery").appendChild(compressedImg); replaced v1
             //#region Calc toal compression
             const shrinked = compressedImg.src.length / (1024 * 1024);
             const sumBeforeCompression = (totalCompressed.origionalSize += orgSize);
             const sumAfterCompression = (totalCompressed.compressedSize += shrinked);
-            const roundedSumBefore = util.roundUp(sumBeforeCompression, 2);
+            const roundedSumBefore = util.roundUp(sumBeforeCompression, 2); //TODO: switch sumBeforeCompression.toFixed(0) instead
             const roundedSumAfter = util.roundUp(sumAfterCompression, 2);
             //#endregion
 
@@ -163,7 +181,6 @@ const DragAndDrop = (props) => {
     let zip = new JSZip();
     for (let index = 0; index < blobsToZip.length; index++) {
       const fileName = blobsToZip[index].name;
-      debugger;
       zip.file(fileName, blobsToZip[index].blob); //3rd param is options {}
     }
     zip.generateAsync({ type: "blob", compression: "STORE" }).then((content) => {
@@ -182,13 +199,16 @@ const DragAndDrop = (props) => {
     }
   };
   //accept=".jpg, .jpeg, .png"
+  //TODO SEE https://react-dropzone.js.org/ (Styling dropzone section to so how to handle dragLeave events
+  //ALSO SEE Previews section from thumbnail preview example)
   return (
     <>
       <h4>
-        Size before compression <b style={{ color: "red" }}>{totalCompressed.origionalSize}</b> Mb
+        Size before image compression{" "}
+        <b style={{ color: "red" }}>{totalCompressed.origionalSize}</b> Mb
       </h4>
       <h4>
-        Size after compression{" "}
+        Size after image compression{" "}
         <b style={{ color: "lightgreen" }}>{totalCompressed.compressedSize}</b> Mb
       </h4>
       <div
@@ -199,17 +219,49 @@ const DragAndDrop = (props) => {
         onDragEnter={(e) => handleDragEnter(e)}
         onDragLeave={(e) => handleDragLeave(e)}
       >
-        <p>Drag .jpg, .jpeg, .png files here to upload</p>
+        <p>Drag .jpg, .png, .webp files here to upload</p>
       </div>
       {/* <progress id="progress-bar" max={100} value={0}></progress> html5 variant*/}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <ProgressBar key="progress-bar" completed={percent} />
       </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      {/* <div style={{ display: "flex", justifyContent: "center" }}>
         <div id="gallery"></div>
-      </div>
+      </div> */}
+      <aside style={thumbsContainer}>{thumbs}</aside>
     </>
   );
 };
 
 export default DragAndDrop;
+//thumbnails styles
+const thumbsContainer = {
+  display: "flex",
+  flexDirection: "row",
+  flexWrap: "wrap",
+  marginTop: 16,
+};
+
+const thumb = {
+  display: "inline-flex",
+  borderRadius: 2,
+  border: "1px solid #eaeaea",
+  marginBottom: 8,
+  marginRight: 8,
+  width: 100,
+  height: 100,
+  padding: 4,
+  boxSizing: "border-box",
+};
+
+const thumbInner = {
+  display: "flex",
+  minWidth: 0,
+  overflow: "hidden",
+};
+
+const img = {
+  display: "block",
+  width: "auto",
+  height: "100%",
+};

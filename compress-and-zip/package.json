@@ -13,6 +13,9 @@
     "next": "^9.5.4",
     "react": "16.13.1",
     "react-dom": "^16.13.1",
+    "react-spring": "^8.0.27",
+    "react-use-gesture": "^7.0.16",
+    "react-with-gesture": "^4.0.8",
     "worker-plugin": "^5.0.0"
   }
 }

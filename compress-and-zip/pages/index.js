@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.css";
 import { useReducer } from "react";
 import { dragEventsReducer } from "../src/reducers/dragEventsReducer";
 import DragAndDrop from "../src/components/customDnd/DragAndDrop";
+import FormatSlider from "../src/components/FormatSlider";
 // import { Container } from "../src/components/droppable/DroppableContainer";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
 
       <main className={styles.main}>
         {/* Custom dnd TODO: refactor this with memo and useCallback liek premade dnd and add custom css from "vanila with gallery*/}
+        <FormatSlider>Format</FormatSlider>
         <div>
           <DragAndDrop data={data} dispatch={dispatch} />
           <ol className="dropped-files">
@@ -30,7 +32,7 @@ export default function Home() {
             })}
           </ol>
         </div>
-        {/* react-dnd Premade compoenent -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
+        {/* react-dnd Premade compoenent EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
         {/* <DndProvider backend={HTML5Backend}>
           <Container />
         </DndProvider> */}
