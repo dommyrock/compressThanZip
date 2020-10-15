@@ -25,6 +25,14 @@ export default function Home() {
       <main className={styles.main}>
         {/* Custom dnd TODO: refactor this with memo and useCallback liek premade dnd and add custom css from "vanila with gallery*/}
         <FormatSlider dispatch={dispatch}>Format</FormatSlider>
+        <div style={{ display: "flex" }}>
+          <img
+            width="35"
+            height="35"
+            src="/info.svg"
+            title="Slide 'Format' to select output image format.&#010;Images are also zipped into compressedImages.zip"
+          />
+        </div>
         <div>
           <DragAndDrop data={data} dispatch={dispatch} />
           <ol className="dropped-files">
@@ -33,12 +41,12 @@ export default function Home() {
             })}
           </ol>
         </div>
-        {/* react-dnd Premade compoenent EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
+        TODO sync to google driive sync to one drive
+        {/* EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
         {/* <DndProvider backend={HTML5Backend}>
           <Container />
         </DndProvider> */}
-
-        <div style={{ border: "solid" }}>
+        {/* <div style={{ border: "solid" }}>
           <div style={{ margin: "4px", border: "solid" }}>
             <p>Examples of dnd</p>
             <ul>
@@ -60,7 +68,7 @@ export default function Home() {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
       </main>
 
       <footer className={styles.footer}>

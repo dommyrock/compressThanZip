@@ -47,3 +47,11 @@ const FormatSlider = ({ children, dispatch }) => {
 };
 
 export default FormatSlider;
+
+/**
+ * REACT SPRING 
+ * It looks like props.number is a number but it's not,
+ *  it's an instance of AnimatedValue from react-spring so you can't apply your typical functions to it and what not.
+  I'm pretty sure if you wanna format that number value you can just do something like 
+  {props.number.interpolate(number => number.toFixed())}
+ */

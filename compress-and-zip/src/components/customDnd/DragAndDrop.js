@@ -4,6 +4,7 @@ import util from "../../util";
 import ProgressBar from "../ProgressBar";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
+import { useSpring, animated } from "react-spring";
 //Convert loaded imgs to blobs (so we can zip/save)
 //TODO: zip.js docs https://gildas-lormeau.github.io/zip.js/core-api.html
 
@@ -28,6 +29,17 @@ const DragAndDrop = (props) => {
       </div>
     ));
   }
+  //update spring props on compression size capture
+  const springPropsBefore = useSpring({
+    to: { number: totalCompressed.origionalSize, opacity: 1, color: "red" },
+    from: { number: 0, opacity: 0, color: "#ccc" },
+    config: { duration: 2000 },
+  });
+  const springPropsAfter = useSpring({
+    to: { number: totalCompressed.compressedSize, opacity: 1, color: "lightgreen" },
+    from: { number: 0, opacity: 0, color: "#ccc" },
+    config: { duration: 1500 },
+  });
 
   // const workerRef = useRef(); Currently not used
   // useEffect(() => {
@@ -145,6 +157,7 @@ const DragAndDrop = (props) => {
             }
             setPercent(rounded);
             console.log(`Process currently @ ${rounded}%`);
+            debugger;
             setTotalCompressed({
               origionalSize: roundedSumBefore,
               compressedSize: roundedSumAfter,
@@ -204,12 +217,22 @@ const DragAndDrop = (props) => {
   return (
     <>
       <h4>
-        Size before image compression{" "}
-        <b style={{ color: "red" }}>{totalCompressed.origionalSize}</b> Mb
+        Before compression{" "}
+        {springPropsBefore && (
+          <animated.b style={springPropsBefore}>
+            {springPropsBefore.number.interpolate((number) => number.toFixed(2))}
+          </animated.b>
+        )}{" "}
+        Mb
       </h4>
       <h4>
-        Size after image compression{" "}
-        <b style={{ color: "lightgreen" }}>{totalCompressed.compressedSize}</b> Mb
+        After compression{" "}
+        {springPropsAfter && (
+          <animated.b style={springPropsAfter}>
+            {springPropsAfter.number.interpolate((number) => number.toFixed(2))}
+          </animated.b>
+        )}{" "}
+        Mb
       </h4>
       <div
         id="drop-zone"
