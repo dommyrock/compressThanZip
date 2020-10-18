@@ -21,11 +21,14 @@ const FormatSlider = ({ children, dispatch }) => {
   });
   //change text as we delta changes(we slide left /,righ)
   let renderText = "";
-  if (delta[0] > 180) renderText = "jpeg";
-  else if (delta[0] < -90) renderText = "webp";
+  if (delta[0] > 180) {
+    renderText = "jpeg";
+  } else if (delta[0] < -180) {
+    renderText = "webp";
+  }
+
   useEffect(() => {
-    //update state in home component
-    dispatch({ SET_OUTPUT_FORMAT, renderText });
+    dispatch({ type: SET_OUTPUT_FORMAT, renderText });
   }, [renderText]);
 
   return (

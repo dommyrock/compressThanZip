@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import { dragEventsReducer } from "../src/reducers/dragEventsReducer";
 import DragAndDrop from "../src/components/customDnd/DragAndDrop";
 import FormatSlider from "../src/components/FormatSlider";
+import TransTest from "../src/components/transTest";
 // import { Container } from "../src/components/droppable/DroppableContainer";
 
 export default function Home() {
@@ -24,7 +25,9 @@ export default function Home() {
 
       <main className={styles.main}>
         {/* Custom dnd TODO: refactor this with memo and useCallback liek premade dnd and add custom css from "vanila with gallery*/}
-        <FormatSlider dispatch={dispatch}>Format</FormatSlider>
+        <FormatSlider dispatch={dispatch} data={data}>
+          Format
+        </FormatSlider>
         <div style={{ display: "flex" }}>
           <img
             width="35"
@@ -41,34 +44,13 @@ export default function Home() {
             })}
           </ol>
         </div>
+        {/* WORKING R-SPRING EXAMPLE  */}
+        {/* <TransTest /> */}
         TODO sync to google driive sync to one drive
         {/* EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
         {/* <DndProvider backend={HTML5Backend}>
           <Container />
         </DndProvider> */}
-        {/* <div style={{ border: "solid" }}>
-          <div style={{ margin: "4px", border: "solid" }}>
-            <p>Examples of dnd</p>
-            <ul>
-              <li>
-                <a href="https://web.dev/drag-and-drop/">web dev</a>
-              </li>
-              <li>
-                <a href="https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/">
-                  Vanila with gallery
-                </a>
-              </li>
-              <li>
-                <a href="https://www.digitalocean.com/community/tutorials/js-drag-and-drop-vanilla-js">
-                  Vanila js example
-                </a>
-              </li>
-              <li>
-                <a href="https://stuk.github.io/jszip/documentation/api_jszip.html">jzip API</a>
-              </li>
-            </ul>
-          </div>
-        </div> */}
       </main>
 
       <footer className={styles.footer}>

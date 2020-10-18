@@ -46,25 +46,11 @@ export default {
     let newImageData = canvas.toDataURL(mime_type, quality / 100);
 
     let result_image_obj = new Image();
-    result_image_obj.id = image_Id;
+    //Get filename/change img extension
+    result_image_obj.id = this.changeOutputFileType(image_Id, mime_type);
     result_image_obj.src = newImageData;
     return result_image_obj;
   },
-  //resize img if needed
-  // async returnNewImageAsync(src, width, height) {
-  //   return new Promise((resolve, reject) => {
-  //     let result_image_obj = new Image();
-  //     //alter image if needed
-  //     result_image_obj.onload = () => {
-  //       result_image_obj.width = width;
-  //       result_image_obj.height = height;
-  //       resolve(result_image_obj);
-  //     };
-  //     result_image_obj.onerror = (ev) => reject(ev);
-  //     //trigger onload
-  //     result_image_obj.src = src;
-  //   });
-  // },
 
   /**
    * Conserve aspect ratio of the original region. Useful when shrinking/enlarging
@@ -87,5 +73,21 @@ export default {
   roundUp(num, precision) {
     precision = Math.pow(10, precision);
     return Math.ceil(num * precision) / precision;
+  },
+  /**
+   * Switch output file type
+   * @param {String} file_name
+   * @param {String} mime_type
+   */
+  changeOutputFileType(file_name, mime_type) {
+    let indexOfDot = file_name.lastIndexOf(".");
+    switch (mime_type) {
+      case "image/png":
+        return file_name.substr(0, indexOfDot < 0 ? file_name.length : indexOfDot) + ".png";
+      case "image/webp":
+        return file_name.substr(0, indexOfDot < 0 ? file_name.length : indexOfDot) + ".webp";
+      case "image/jpeg":
+        return file_name.substr(0, indexOfDot < 0 ? file_name.length : indexOfDot) + ".jpeg";
+    }
   },
 };

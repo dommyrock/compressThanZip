@@ -1,10 +1,10 @@
 import { ADD_FILE_TO_LIST, SET_DROP_DEPTH, SET_IN_DROP_ZONE } from "../../actions";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import util from "../../util";
 import ProgressBar from "../ProgressBar";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
-import { useSpring, animated } from "react-spring";
+import { useSpring, useTransition, animated } from "react-spring";
 //Convert loaded imgs to blobs (so we can zip/save)
 //TODO: zip.js docs https://gildas-lormeau.github.io/zip.js/core-api.html
 
@@ -17,18 +17,7 @@ const DragAndDrop = (props) => {
     compressedSize: 0,
   });
   const [percent, setPercent] = useState(0);
-  const [thumbs, setThumbs] = useState([]);
 
-  function handleFiles(files) {
-    debugger;
-    return files.map((file) => (
-      <div style={thumb} key={file.name}>
-        <div style={thumbInner}>
-          <img src={URL.createObjectURL(file)} style={img} />
-        </div>
-      </div>
-    ));
-  }
   //update spring props on compression size capture
   const springPropsBefore = useSpring({
     to: { number: totalCompressed.origionalSize, opacity: 1, color: "red" },
@@ -40,6 +29,13 @@ const DragAndDrop = (props) => {
     from: { number: 0, opacity: 0, color: "#ccc" },
     config: { duration: 1500 },
   });
+  //transition img div container onLoad image
+  // const [galleryImages, setGalleryImage] = useState([]);
+
+  // const transitions = useTransition(galleryImages, (img) => img.key, {
+  //   from: { transform: "translate3d(0,-40px,0)" },
+  //   enter: { transform: "translate3d(0,0px,0)" },
+  // });
 
   // const workerRef = useRef(); Currently not used
   // useEffect(() => {
@@ -92,13 +88,10 @@ const DragAndDrop = (props) => {
     dispatch({ type: SET_IN_DROP_ZONE, inDropZone: true });
   };
   //TODO: make ui and components so i can load thumbnails into some kind of carrosel,
-  //TODO 2 use react-tree-fiber +/- spring for some cool animations as img's are being loaded to DOM
   /**
    * https://codepen.io/joezimjs/pen/yPWQbd
    * https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
-   * and see premade dnd compoenets for react performance optimization and re-enter dragging event
-   * 1+ add react-tree fiber or spring for cool animations (for example as thumbs render drop down to carrosell animation )
-   * see https://www.youtube.com/watch?v=5QCYBiANRYs&ab_channel=ReactEurope
+   * see https://www.youtube.com/watch?v=5QCYBiANRYs&ab_channel=ReactEurope (react-spring)
    * 2+ offload work with workers where posible ( zipping should be moved first )
    * 3+ add sharing to google drive,one drive,dropbox ... (use their api's,auth...)
    * 4+ add ML (image tagging/classification w ML models...)
@@ -107,8 +100,6 @@ const DragAndDrop = (props) => {
     e.preventDefault();
     e.stopPropagation();
     let files = [...e.dataTransfer.files];
-
-    setThumbs(handleFiles(files));
 
     //#region  Worker-code
     // let buffers = [];
@@ -138,14 +129,20 @@ const DragAndDrop = (props) => {
           img.onload = () => {
             //1024 bytes =1k ,1024 Kb = 1Mb
             const orgSize = img.src.length / (1024 * 1024);
-            let compressedImg = util.toCompressedImg(img, 65, "jpeg", file.name);
+            let compressedImg = util.toCompressedImg(img, 65, data.outputFormat, file.name);
+            //ADD TO GALLERY
+            document.getElementById("gallery").appendChild(compressedImg);
 
-            // document.getElementById("gallery").appendChild(compressedImg); replaced v1
+            // REACT-SPRING ON IMAGE LOAD
+            // setGalleryImage((state) =>
+            //   state.concat({ src: compressedImg.src, key: compressedImg.id, width: 150 })
+            // );
+
             //#region Calc toal compression
             const shrinked = compressedImg.src.length / (1024 * 1024);
             const sumBeforeCompression = (totalCompressed.origionalSize += orgSize);
             const sumAfterCompression = (totalCompressed.compressedSize += shrinked);
-            const roundedSumBefore = util.roundUp(sumBeforeCompression, 2); //TODO: switch sumBeforeCompression.toFixed(0) instead
+            const roundedSumBefore = util.roundUp(sumBeforeCompression, 2); //or.toFixed(2)
             const roundedSumAfter = util.roundUp(sumAfterCompression, 2);
             //#endregion
 
@@ -157,7 +154,6 @@ const DragAndDrop = (props) => {
             }
             setPercent(rounded);
             console.log(`Process currently @ ${rounded}%`);
-            debugger;
             setTotalCompressed({
               origionalSize: roundedSumBefore,
               compressedSize: roundedSumAfter,
@@ -185,8 +181,10 @@ const DragAndDrop = (props) => {
 
     let blobs = [];
     for (const img of processedImages) {
-      const response = await fetch(img.src);
-      blobs.push({ blob: response.blob(), name: img.id });
+      //NOTE: when usign fetch.blob() mime-type is lost
+      const response = await (await fetch(img.src)).blob();
+
+      blobs.push({ blob: response, name: img.id });
     }
     const blobsToZip = await Promise.all(blobs);
 
@@ -194,10 +192,10 @@ const DragAndDrop = (props) => {
     let zip = new JSZip();
     for (let index = 0; index < blobsToZip.length; index++) {
       const fileName = blobsToZip[index].name;
-      zip.file(fileName, blobsToZip[index].blob); //3rd param is options {}
+      zip.file(fileName, blobsToZip[index].blob);
     }
     zip.generateAsync({ type: "blob", compression: "STORE" }).then((content) => {
-      debugger;
+      // debugger;
       saveAs(content, "compressedImages");
     });
     //#endregion
@@ -212,8 +210,6 @@ const DragAndDrop = (props) => {
     }
   };
   //accept=".jpg, .jpeg, .png"
-  //TODO SEE https://react-dropzone.js.org/ (Styling dropzone section to so how to handle dragLeave events
-  //ALSO SEE Previews section from thumbnail preview example)
   return (
     <>
       <h4>
@@ -244,47 +240,21 @@ const DragAndDrop = (props) => {
       >
         <p>Drag .jpg, .png, .webp files here to upload</p>
       </div>
-      {/* <progress id="progress-bar" max={100} value={0}></progress> html5 variant*/}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <ProgressBar key="progress-bar" completed={percent} />
       </div>
-      {/* <div style={{ display: "flex", justifyContent: "center" }}>
-        <div id="gallery"></div>
-      </div> */}
-      <aside style={thumbsContainer}>{thumbs}</aside>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div id="gallery">
+          {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
+          {/* {transitions.map(({ item, props, key }) => {
+            <animated.div key={key} style={props}>
+              <img src={item.src} width={item.width} alt="gallery-img" />;
+            </animated.div>;
+          })} */}
+        </div>
+      </div>
     </>
   );
 };
 
 export default DragAndDrop;
-//thumbnails styles
-const thumbsContainer = {
-  display: "flex",
-  flexDirection: "row",
-  flexWrap: "wrap",
-  marginTop: 16,
-};
-
-const thumb = {
-  display: "inline-flex",
-  borderRadius: 2,
-  border: "1px solid #eaeaea",
-  marginBottom: 8,
-  marginRight: 8,
-  width: 100,
-  height: 100,
-  padding: 4,
-  boxSizing: "border-box",
-};
-
-const thumbInner = {
-  display: "flex",
-  minWidth: 0,
-  overflow: "hidden",
-};
-
-const img = {
-  display: "block",
-  width: "auto",
-  height: "100%",
-};

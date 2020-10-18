@@ -1,7 +1,6 @@
 import { ADD_FILE_TO_LIST, SET_DROP_DEPTH, SET_IN_DROP_ZONE, SET_OUTPUT_FORMAT } from "../actions";
 
 export const dragEventsReducer = (state, action) => {
-  debugger;
   switch (action.type) {
     case SET_DROP_DEPTH:
       return { ...state, dropDepth: action.dropDepth };
@@ -10,7 +9,7 @@ export const dragEventsReducer = (state, action) => {
     case ADD_FILE_TO_LIST:
       return { ...state, fileList: state.fileList.concat(action.files) };
     case SET_OUTPUT_FORMAT:
-      return { ...state, outputFormat: action.outputFormat };
+      return { ...state, outputFormat: action.renderText };
     default:
       return state;
   }
