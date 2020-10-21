@@ -1,4 +1,4 @@
-import { ADD_FILE_TO_LIST, SET_DROP_DEPTH, SET_IN_DROP_ZONE } from "../../actions";
+import { ADD_FILE_TO_LIST, SET_DROP_DEPTH, SET_IN_DROP_ZONE, SET_SHARE_URL } from "../../actions";
 import { useState } from "react";
 import util from "../../util";
 import ProgressBar from "../ProgressBar";
@@ -195,6 +195,11 @@ const DragAndDrop = (props) => {
       zip.file(fileName, blobsToZip[index].blob);
     }
     zip.generateAsync({ type: "blob", compression: "STORE" }).then((content) => {
+      const shareData = {
+        share_URL: URL.createObjectURL(content).replace("blob:", ""),
+        share_file_name: "compressedImages.zip",
+      };
+      dispatch({ type: SET_SHARE_URL, share: shareData });
       // debugger;
       saveAs(content, "compressedImages");
     });

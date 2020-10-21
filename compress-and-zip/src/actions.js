@@ -2,3 +2,4 @@ export const SET_DROP_DEPTH = "SET_DROP_DEPTH";
 export const SET_IN_DROP_ZONE = "SET_IN_DROP_ZONE";
 export const ADD_FILE_TO_LIST = "ADD_FILE_TO_LIST";
 export const SET_OUTPUT_FORMAT = "SET_OUTPUT_FORMAT";
+export const SET_SHARE_URL = "SET_SHARE_URL";

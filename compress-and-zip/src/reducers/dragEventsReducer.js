@@ -1,4 +1,10 @@
-import { ADD_FILE_TO_LIST, SET_DROP_DEPTH, SET_IN_DROP_ZONE, SET_OUTPUT_FORMAT } from "../actions";
+import {
+  ADD_FILE_TO_LIST,
+  SET_DROP_DEPTH,
+  SET_IN_DROP_ZONE,
+  SET_OUTPUT_FORMAT,
+  SET_SHARE_URL,
+} from "../actions";
 
 export const dragEventsReducer = (state, action) => {
   switch (action.type) {
@@ -10,6 +16,8 @@ export const dragEventsReducer = (state, action) => {
       return { ...state, fileList: state.fileList.concat(action.files) };
     case SET_OUTPUT_FORMAT:
       return { ...state, outputFormat: action.renderText };
+    case SET_SHARE_URL:
+      return { ...state, share: action.share };
     default:
       return state;
   }
