@@ -72,7 +72,6 @@ export default function Home() {
         </div>
         {/* WORKING R-SPRING EXAMPLE  */}
         {/* <TransTest /> */}
-        TODO sync to google driive sync to one drive
         {/* EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}
         {/* <DndProvider backend={HTML5Backend}>
           <Container />
@@ -80,13 +79,7 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        <h4 style={{ marginRight: "10px" }}> Resources :</h4>
-        <a href="https://www.w3schools.com/html/html5_draganddrop.asp">w3schools vanila dnd |</a>
-        <a href="https://react-dnd.github.io/react-dnd/about"> react-dnd |</a>
-        <a href="https://shopify.github.io/draggable/examples/unique-dropzone.html">
-          shopify droppable |
-        </a>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API">MDN</a>
+        <p>Made By: Dominik Polzer</p>
       </footer>
     </div>
   );

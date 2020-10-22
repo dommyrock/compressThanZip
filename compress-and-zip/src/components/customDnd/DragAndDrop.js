@@ -5,9 +5,7 @@ import ProgressBar from "../ProgressBar";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { useSpring, useTransition, animated } from "react-spring";
-//Convert loaded imgs to blobs (so we can zip/save)
-//TODO: zip.js docs https://gildas-lormeau.github.io/zip.js/core-api.html
-
+//OPTIMIZATION NOTE
 //memo is not enough here since also pasing dispatch , i would also need to wrap dispatch in useCallback
 const DragAndDrop = (props) => {
   const { data, dispatch } = props;
@@ -15,19 +13,26 @@ const DragAndDrop = (props) => {
   const [totalCompressed, setTotalCompressed] = useState({
     origionalSize: 0,
     compressedSize: 0,
+    sizeAfterZip: 0,
   });
+  const [sizeAfterZip, setSizeAfterZip] = useState(0);
   const [percent, setPercent] = useState(0);
 
   //update spring props on compression size capture
-  const springPropsBefore = useSpring({
+  const beforeCompression_props = useSpring({
     to: { number: totalCompressed.origionalSize, opacity: 1, color: "red" },
     from: { number: 0, opacity: 0, color: "#ccc" },
-    config: { duration: 2000 },
+    config: { duration: 1400 },
   });
-  const springPropsAfter = useSpring({
-    to: { number: totalCompressed.compressedSize, opacity: 1, color: "lightgreen" },
+  const afterCompression_props = useSpring({
+    to: { number: totalCompressed.compressedSize, opacity: 1, color: "#E5A46F" },
     from: { number: 0, opacity: 0, color: "#ccc" },
-    config: { duration: 1500 },
+    config: { duration: 1600 },
+  });
+  const afterZip_props = useSpring({
+    to: { number: sizeAfterZip, opacity: 1, color: "lightgreen" },
+    from: { number: 0, opacity: 0, color: "#ccc" },
+    config: { duration: 1700 },
   });
   //transition img div container onLoad image
   // const [galleryImages, setGalleryImage] = useState([]);
@@ -199,8 +204,10 @@ const DragAndDrop = (props) => {
         share_URL: URL.createObjectURL(content).replace("blob:", ""),
         share_file_name: "compressedImages.zip",
       };
+      const zippedSize = content.size / (1024 * 1024);
+      setSizeAfterZip(zippedSize);
+
       dispatch({ type: SET_SHARE_URL, share: shareData });
-      // debugger;
       saveAs(content, "compressedImages");
     });
     //#endregion
@@ -217,24 +224,35 @@ const DragAndDrop = (props) => {
   //accept=".jpg, .jpeg, .png"
   return (
     <>
-      <h4>
-        Before compression{" "}
-        {springPropsBefore && (
-          <animated.b style={springPropsBefore}>
-            {springPropsBefore.number.interpolate((number) => number.toFixed(2))}
-          </animated.b>
-        )}{" "}
-        Mb
-      </h4>
-      <h4>
-        After compression{" "}
-        {springPropsAfter && (
-          <animated.b style={springPropsAfter}>
-            {springPropsAfter.number.interpolate((number) => number.toFixed(2))}
-          </animated.b>
-        )}{" "}
-        Mb
-      </h4>
+      <div className="stats_container">
+        <h4>
+          Before compression{" "}
+          {beforeCompression_props && (
+            <animated.b style={beforeCompression_props}>
+              {beforeCompression_props.number.interpolate((number) => number.toFixed(2))}
+            </animated.b>
+          )}{" "}
+          Mb
+        </h4>
+        <h4>
+          After compression{" "}
+          {afterCompression_props && (
+            <animated.b style={afterCompression_props}>
+              {afterCompression_props.number.interpolate((number) => number.toFixed(2))}
+            </animated.b>
+          )}{" "}
+          Mb
+        </h4>
+        <h4>
+          After zip{" "}
+          {afterZip_props && (
+            <animated.b style={afterZip_props}>
+              {afterZip_props.number.interpolate((number) => number.toFixed(2))}
+            </animated.b>
+          )}{" "}
+          Mb
+        </h4>
+      </div>
       <div
         id="drop-zone"
         className={data.inDropZone ? "drag-drop-zone inside-drag-area" : "drag-drop-zone"}
@@ -243,7 +261,7 @@ const DragAndDrop = (props) => {
         onDragEnter={(e) => handleDragEnter(e)}
         onDragLeave={(e) => handleDragLeave(e)}
       >
-        <p>Drag .jpg, .png, .webp files here to upload</p>
+        <p>Drop .jpg, .png, .webp files here to compress</p>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <ProgressBar key="progress-bar" completed={percent} />
