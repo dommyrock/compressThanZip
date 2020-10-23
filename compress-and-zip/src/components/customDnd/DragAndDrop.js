@@ -270,26 +270,32 @@ const DragAndDrop = (props) => {
         </div>
       </div>
       <ProgressBar key="progress-bar" completed={percent} />
-      <div id="gallery">
-        {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
-        {/* {transitions.map(({ item, props, key }) => {
+      {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
+      {/* {transitions.map(({ item, props, key }) => {
             <animated.div key={key} style={props}>
               <img src={item.src} width={item.width} alt="gallery-img" />;
             </animated.div>;
           })} */}
-        {imgsToRender.map((img) => (
-          <img src={img.src} />
-        ))}
-      </div>
+      {imgsToRender.length > 0 && (
+        <div id="gallery">
+          {imgsToRender.map((img) => (
+            <img src={img.src} />
+          ))}
+        </div>
+      )}
       {/* NOTE : TO DO THIS Dynamicaly see https://stackoverflow.com/questions/28802179/how-to-create-a-react-modalwhich-is-append-to-body-with-transitions */}
       {/* DONE : i got css working as in https://codesandbox.io/s/732j6q4620?file=/src/index.js:1204-2452 */}
       {/* NOTE: This is also grid layout example !!! */}
-      <h4>expermental 3D View</h4>
-      <div id="img-stack" className="stack-container-class-root">
-        {imgsToRender.map((img) => (
-          <Stack image={img.src} background="#80b7db63" />
-        ))}
-      </div>
+      {imgsToRender.length > 0 && (
+        <>
+          <h4>expermental 3D View</h4>
+          <div id="img-stack" className="stack-container-class-root">
+            {imgsToRender.map((img) => (
+              <Stack image={img.src} background="#80b7db63" />
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 };
