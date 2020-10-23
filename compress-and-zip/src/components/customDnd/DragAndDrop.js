@@ -5,6 +5,7 @@ import ProgressBar from "../ProgressBar";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { useSpring, useTransition, animated } from "react-spring";
+import Stack from "../image/Stack";
 //OPTIMIZATION NOTE
 //memo is not enough here since also pasing dispatch , i would also need to wrap dispatch in useCallback
 const DragAndDrop = (props) => {
@@ -17,6 +18,7 @@ const DragAndDrop = (props) => {
   });
   const [sizeAfterZip, setSizeAfterZip] = useState(0);
   const [percent, setPercent] = useState(0);
+  const [imgsToRender, setImgsToRender] = useState([]);
 
   //update spring props on compression size capture
   const beforeCompression_props = useSpring({
@@ -136,12 +138,13 @@ const DragAndDrop = (props) => {
             const orgSize = img.src.length / (1024 * 1024);
             let compressedImg = util.toCompressedImg(img, 65, data.outputFormat, file.name);
             //ADD TO GALLERY
-            document.getElementById("gallery").appendChild(compressedImg);
-
-            // REACT-SPRING ON IMAGE LOAD
-            // setGalleryImage((state) =>
-            //   state.concat({ src: compressedImg.src, key: compressedImg.id, width: 150 })
-            // );
+            setImgsToRender((state) =>
+              state.concat({
+                src: compressedImg.src,
+                key: compressedImg.id,
+                width: 160,
+              })
+            );
 
             //#region Calc toal compression
             const shrinked = compressedImg.src.length / (1024 * 1024);
@@ -274,6 +277,18 @@ const DragAndDrop = (props) => {
               <img src={item.src} width={item.width} alt="gallery-img" />;
             </animated.div>;
           })} */}
+        {imgsToRender.map((img) => (
+          <img src={img.src} />
+        ))}
+      </div>
+      {/* NOTE : TO DO THIS Dynamicaly see https://stackoverflow.com/questions/28802179/how-to-create-a-react-modalwhich-is-append-to-body-with-transitions */}
+      {/* DONE : i got css working as in https://codesandbox.io/s/732j6q4620?file=/src/index.js:1204-2452 */}
+      {/* NOTE: This is also grid layout example !!! */}
+      <h4>expermental 3D View</h4>
+      <div id="img-stack" className="stack-container-class-root">
+        {imgsToRender.map((img) => (
+          <Stack image={img.src} background="#80b7db63" />
+        ))}
       </div>
     </>
   );

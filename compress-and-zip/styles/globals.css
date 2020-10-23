@@ -40,7 +40,7 @@ a:hover {
   max-width: 450px;
   border-style: solid;
   border-color: var(--grey-50);
-  border-radius: 20px;
+  border-radius: 10px;
   background-color: #9fa3a705;
   margin-top: 30px;
   margin-bottom: 30px;
@@ -69,7 +69,6 @@ a:hover {
   vertical-align: middle;
   /* Border */
   border: 1px dashed var(--blue-100);
-
   border-radius: 5px;
   padding: 10px;
 }
@@ -228,3 +227,43 @@ progress[value]::-webkit-progress-value {
     max-width: 100%;
   }
 }
+
+/* STACK CONTAINER   */
+.stack-container-class-root {
+  margin-top: 10px;
+  border: 1px solid var(--black-100);
+  border-radius: 5px;
+  /* overflow: hidden; */
+  /* width: 100%;
+  height: 100%; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 350px;
+  perspective-origin: 50% 50%;
+  /* GRID CSS */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.stack-container-class {
+  width: 150px;
+  height: 150px;
+  margin: 15px;
+  transform-style: flat;
+}
+
+.stack-container-class > div {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: grey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  will-change: transform;
+  cursor: pointer;
+  /* border-radius: 5px; */
+}
+/* STACK CONTAINER   ENDS*/
