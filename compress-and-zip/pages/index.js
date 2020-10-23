@@ -39,7 +39,7 @@ export default function Home() {
       <main className={styles.main}>
         {/* SAVE TO DRIVE API: https://developers.google.com/drive/api/v3/savetodrive */}
         {/* TODO : Login w google acc to be able to share to google drive https://developers.google.com/identity/sign-in/web/sign-in  & https://www.youtube.com/watch?v=l9atSDs7-oI&ab_channel=Amarindaz*/}
-        {data.share.share_URL && (
+        {/* {data.share.share_URL && (
           <>
             <a
               href="javascript:void(0)"
@@ -50,7 +50,7 @@ export default function Home() {
             </a>
             <div id="savetodrive-div"></div>
           </>
-        )}
+        )} */}
         <FormatSlider dispatch={dispatch} data={data}>
           Format
         </FormatSlider>
@@ -62,14 +62,14 @@ export default function Home() {
             title="Slide 'Format' to select output image format.&#010;Images are also zipped into compressedImages.zip"
           />
         </div>
-        <div>
+        <>
           <DragAndDrop data={data} dispatch={dispatch} />
           <ol className="dropped-files">
             {data.fileList.map((f) => {
               return <li key={f.name}>{f.name}</li>;
             })}
           </ol>
-        </div>
+        </>
         {/* WORKING R-SPRING EXAMPLE  */}
         {/* <TransTest /> */}
         {/* EXAMPLE -REMOVED Because i made custom one (remove this when i finish cusom one)*/}

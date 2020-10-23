@@ -205,7 +205,7 @@ const DragAndDrop = (props) => {
         share_file_name: "compressedImages.zip",
       };
       const zippedSize = content.size / (1024 * 1024);
-      setSizeAfterZip(zippedSize);
+      setSizeAfterZip(Math.ceil(zippedSize * 10) / 10);
 
       dispatch({ type: SET_SHARE_URL, share: shareData });
       saveAs(content, "compressedImages");
@@ -224,57 +224,56 @@ const DragAndDrop = (props) => {
   //accept=".jpg, .jpeg, .png"
   return (
     <>
-      <div className="stats_container">
-        <h4>
-          Before compression{" "}
-          {beforeCompression_props && (
-            <animated.b style={beforeCompression_props}>
-              {beforeCompression_props.number.interpolate((number) => number.toFixed(2))}
-            </animated.b>
-          )}{" "}
-          Mb
-        </h4>
-        <h4>
-          After compression{" "}
-          {afterCompression_props && (
-            <animated.b style={afterCompression_props}>
-              {afterCompression_props.number.interpolate((number) => number.toFixed(2))}
-            </animated.b>
-          )}{" "}
-          Mb
-        </h4>
-        <h4>
-          After zip{" "}
-          {afterZip_props && (
-            <animated.b style={afterZip_props}>
-              {afterZip_props.number.interpolate((number) => number.toFixed(2))}
-            </animated.b>
-          )}{" "}
-          Mb
-        </h4>
+      <div className="stats-drop-container">
+        <div className="stats_container">
+          <h4>
+            Before compression:{" "}
+            {beforeCompression_props && (
+              <animated.b style={beforeCompression_props}>
+                {beforeCompression_props.number.interpolate((number) => number.toFixed(2))}
+              </animated.b>
+            )}{" "}
+            Mb
+          </h4>
+          <h4>
+            After compression:{" "}
+            {afterCompression_props && (
+              <animated.b style={afterCompression_props}>
+                {afterCompression_props.number.interpolate((number) => number.toFixed(2))}
+              </animated.b>
+            )}{" "}
+            Mb
+          </h4>
+          <h4>
+            After zip:{" "}
+            {afterZip_props && (
+              <animated.b style={afterZip_props}>
+                {afterZip_props.number.interpolate((number) => number.toFixed(2))}
+              </animated.b>
+            )}{" "}
+            Mb
+          </h4>
+        </div>
+        <div
+          id="drop-zone"
+          className={data.inDropZone ? "drag-drop-zone inside-drag-area" : "drag-drop-zone"}
+          onDrop={(e) => handleDrop(e)}
+          onDragOver={(e) => handleDragOver(e)}
+          onDragEnter={(e) => handleDragEnter(e)}
+          onDragLeave={(e) => handleDragLeave(e)}
+        >
+          <p>Drop images here [.jpg, .png, .webp]</p>
+          {/* <p>Suported[.jpg, .png, .webp]</p> */}
+        </div>
       </div>
-      <div
-        id="drop-zone"
-        className={data.inDropZone ? "drag-drop-zone inside-drag-area" : "drag-drop-zone"}
-        onDrop={(e) => handleDrop(e)}
-        onDragOver={(e) => handleDragOver(e)}
-        onDragEnter={(e) => handleDragEnter(e)}
-        onDragLeave={(e) => handleDragLeave(e)}
-      >
-        <p>Drop .jpg, .png, .webp files here to compress</p>
-      </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <ProgressBar key="progress-bar" completed={percent} />
-      </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div id="gallery">
-          {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
-          {/* {transitions.map(({ item, props, key }) => {
+      <ProgressBar key="progress-bar" completed={percent} />
+      <div id="gallery">
+        {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
+        {/* {transitions.map(({ item, props, key }) => {
             <animated.div key={key} style={props}>
               <img src={item.src} width={item.width} alt="gallery-img" />;
             </animated.div>;
           })} */}
-        </div>
       </div>
     </>
   );
