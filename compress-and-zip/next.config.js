@@ -6,7 +6,18 @@ module.exports = withPWA({
   pwa: {
     dest: "public",
     disable: prod ? false : true, // solution from https://github.com/GoogleChrome/workbox/issues/1790
-    runtimeCaching,
+    runtimeCaching: [
+      {
+        urlPattern: /^https?.*/,
+        handler: "NetworkFirst",
+        options: {
+          cacheName: "offlineCache",
+          expiration: {
+            maxEntries: 200,
+          },
+        },
+      },
+    ],
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     if (!isServer) {
