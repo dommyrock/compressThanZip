@@ -1,6 +1,13 @@
 const WorkerPlugin = require("worker-plugin");
-
-module.exports = {
+const withPWA = require("next-pwa");
+const runtimeCaching = require("next-pwa/cache");
+const prod = process.env.NODE_ENV === "production";
+module.exports = withPWA({
+  pwa: {
+    dest: "public",
+    disable: prod ? false : true, // solution from https://github.com/GoogleChrome/workbox/issues/1790
+    runtimeCaching,
+  },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     if (!isServer) {
       config.plugins.push(
@@ -22,7 +29,7 @@ module.exports = {
     }
     return config;
   },
-};
+});
 
 /**
  * Source

@@ -30,8 +30,8 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Compress&Share</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Zip & Share</title>
+        <link rel="icon" href="/siteLogo.png" />
         <script src="https://apis.google.com/js/platform.js" async defer></script>
       </Head>
 
