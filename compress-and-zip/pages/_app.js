@@ -15,6 +15,9 @@ function MyApp({ Component, pageProps }) {
           <meta name="description" content="Description" />
           <meta name="keywords" content="Keywords" />
           <link rel="manifest" href="/manifest.json" />
+          <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+
+          <meta name="apple-mobile-web-app-capable" content="yes"></meta>
           <link
             rel="apple-touch-startup-image"
             href="/icons/apple-splash-2048-2732.jpg"
