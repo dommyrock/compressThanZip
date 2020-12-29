@@ -8,9 +8,7 @@ import { useSpring, useTransition, animated } from "react-spring";
 import Stack from "../image/Stack";
 //OPTIMIZATION NOTE
 //memo is not enough here since also pasing dispatch , i would also need to wrap dispatch in useCallback
-const DragAndDrop = (props) => {
-  const { data, dispatch } = props;
-
+const DragAndDrop = ({ data, dispatch }) => {
   const [totalCompressed, setTotalCompressed] = useState({
     origionalSize: 0,
     compressedSize: 0,
@@ -73,6 +71,7 @@ const DragAndDrop = (props) => {
     e.stopPropagation();
 
     dispatch({ type: SET_DROP_DEPTH, dropDepth: data.dropDepth + 1 });
+    dispatch({ type: SET_IN_DROP_ZONE, inDropZone: true });
   };
 
   const handleDragLeave = (e) => {
@@ -86,7 +85,11 @@ const DragAndDrop = (props) => {
     // e.currentTarget.style.background = "white"; example handler for firefox
     // e.target.classList.remove("inside-drag-area"); didnt work
   };
-
+  const handleDragEnd = (event) => {
+    event.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: SET_IN_DROP_ZONE, inDropZone: false });
+  };
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,7 +109,14 @@ const DragAndDrop = (props) => {
   const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    let files = [...e.dataTransfer.files];
+    let files;
+    if (!e.dataTransfer) {
+      files = [...e.target.files];
+      debugger;
+    } else {
+      files = [...e.dataTransfer.files];
+      debugger;
+    }
 
     //#region  Worker-code
     // let buffers = [];
@@ -264,18 +274,44 @@ const DragAndDrop = (props) => {
           onDragOver={(e) => handleDragOver(e)}
           onDragEnter={(e) => handleDragEnter(e)}
           onDragLeave={(e) => handleDragLeave(e)}
+          onDragEnd={(e) => handleDragEnd(e)}
         >
-          <p>Drop images here [.jpg, .png, .webp]</p>
-          {/* <p>Suported[.jpg, .png, .webp]</p> */}
+          <svg
+            width={25}
+            height={25}
+            style={{ color: "rgba(120,120,120,120)" }}
+            stroke="currentColor"
+            fill="rgba(109, 186, 201, 0.36)"
+            viewBox="0 0 48 48"
+            aria-hidden="true"
+          >
+            <path
+              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          <div className="drop-zone-txt">
+            <label className="drop-zone-label">
+              <span className="font-500">Upload files</span>
+              <input
+                id="file-upload"
+                name="file-upload"
+                type="file"
+                multiple
+                className="sr-only"
+                onChange={(e) => handleDrop(e)}
+                accept=".jpg,.jpeg,.webp,.png"
+              />
+            </label>
+            <p>or drag and drop</p>
+          </div>
+          <p>JPG, PNG, WEBP</p>
         </div>
       </div>
       <ProgressBar key="progress-bar" completed={percent} />
-      {/* THIS DIDNT WORK OUT (NEED TO RESEARCH HOW TO ANIMTE IMAGE CONTAINER DIV ON IMG LOAD) */}
-      {/* {transitions.map(({ item, props, key }) => {
-            <animated.div key={key} style={props}>
-              <img src={item.src} width={item.width} alt="gallery-img" />;
-            </animated.div>;
-          })} */}
       {imgsToRender.length > 0 && (
         <div id="gallery">
           {imgsToRender.map((img) => (

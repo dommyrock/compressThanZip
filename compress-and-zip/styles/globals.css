@@ -9,9 +9,13 @@ body {
   /* justify-items: center; */
   --black-100: #c2c5c9;
   --grey-100: #636568;
-  --grey-50: #aca9a921;
+  --grey-50: #aca9a9de;
   --blue-100: #5391b9;
+  --blue-200: rgba(59, 130, 246, 0.8);
   --blue-50: #80b7db34;
+
+  --font-500: 500;
+  --font-400: 400;
 }
 
 a {
@@ -81,8 +85,8 @@ a:hover {
   padding: 2rem;
   text-align: center;
   border-radius: 0.5rem;
-  box-shadow: 5px 5px 10px #c0c0c0;
   border: dashed;
+  border-color: #6365686b;
   min-width: 500px;
   max-width: 450px;
 }
@@ -92,15 +96,47 @@ a:hover {
   z-index: 10;
 }
 .drag-drop-zone.inside-drag-area {
-  opacity: 0.7;
-  background-color: rgba(13, 243, 224, 0.637);
+  background-color: rgba(155, 171, 175, 0.267);
   border-color: rgb(68, 68, 68);
+  opacity: 0.3;
 }
 .dropped-files li {
   color: #07f;
   padding: 3px;
   text-align: left;
   font-weight: bold;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+span.font-500 {
+  font-weight: var(--font-500);
+  color: var(--blue-200);
+  cursor: pointer;
+}
+
+.drop-zone-label {
+  display: inline-block;
+}
+.drop-zone-txt > p {
+  margin-left: 0.5rem;
+  font-weight: var(--font-400);
+  display: inline-block;
+  margin: 0;
+}
+#drop-zone > p {
+  font-weight: var(--font-400);
+  color: var(--blue-200);
 }
 /* Droppable css  Ends*/
 
