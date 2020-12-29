@@ -1,12 +1,26 @@
 const WorkerPlugin = require("worker-plugin");
 const withPWA = require("next-pwa");
-const runtimeCaching = require("next-pwa/cache");
+// const withOffline = require("next-offline");
+// const runtimeCaching = require("next-pwa/cache");
+
 const prod = process.env.NODE_ENV === "production";
 module.exports = withPWA({
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/,
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "offlineCache",
+        expiration: {
+          maxEntries: 200,
+        },
+      },
+    },
+  ],
   pwa: {
     dest: "public",
     disable: prod ? false : true, // solution from https://github.com/GoogleChrome/workbox/issues/1790
-    runtimeCaching,
+    // runtimeCaching,
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     if (!isServer) {
