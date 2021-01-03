@@ -127,6 +127,7 @@ span.font-500 {
 
 .drop-zone-label {
   display: inline-block;
+  margin-right: 5px;
 }
 .drop-zone-txt > p {
   margin-left: 0.5rem;
